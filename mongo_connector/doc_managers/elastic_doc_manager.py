@@ -55,8 +55,9 @@ class DocManager(DocManagerBase):
                  unique_key='_id', chunk_size=DEFAULT_MAX_BULK,
                  meta_index_name="mongodb_meta", meta_type="mongodb_meta",
                  attachment_field="content", **kwargs):
+        hosts = self._get_hosts(url)
         self.elastic = Elasticsearch(
-            hosts=[url], **kwargs.get('clientOptions', {}))
+            hosts=hosts, **kwargs.get('clientOptions', {}))
         self.auto_commit_interval = auto_commit_interval
         self.meta_index_name = meta_index_name
         self.meta_type = meta_type
@@ -68,6 +69,14 @@ class DocManager(DocManagerBase):
 
         self.has_attachment_mapping = False
         self.attachment_field = attachment_field
+
+    def _get_hosts(self, url):
+        if isinstance(url, list):
+            return url
+        elif isinstance(url, str):
+            return url.split(',')
+        else:
+            raise errors.ConnectionFailed("Invalid URI for Elastic")
 
     def _index_and_mapping(self, namespace):
         """Helper method for getting the index and type from a namespace."""
