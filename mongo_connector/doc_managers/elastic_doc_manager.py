@@ -57,7 +57,7 @@ class DocManager(DocManagerBase):
                  attachment_field="content", **kwargs):
         hosts = self._get_hosts(url)
         self.elastic = Elasticsearch(
-            hosts=hosts, **kwargs.get('clientOptions', {}))
+            hosts=hosts, timeout=60, **kwargs.get('clientOptions', {}))
         self.auto_commit_interval = auto_commit_interval
         self.meta_index_name = meta_index_name
         self.meta_type = meta_type
